@@ -2,6 +2,7 @@
 #include <ctime>
 #include <fstream>
 #include <iostream>
+#include <stdexcept>
 #include <string>
 using namespace std;
 
@@ -39,12 +40,10 @@ public:
     bool setValue(int index, int value)
     {
         if (index < 0 || index >= size) {
-            cout << "неверный индекс" << endl;
-            return false;
+            throw std::out_of_range("неверный индекс");
         }
         if (value < -100 || value > 100) {
-            cout << "значение не принадлежит [-100; 100]" << endl;
-            return false;
+            throw std::invalid_argument("значение не принадлежит [-100; 100]");
         }
         arr[index] = value;
         return true;
@@ -53,8 +52,7 @@ public:
     int getValue(int index)
     {
         if (index < 0 || index >= size) {
-            cout << "неверный индекс";
-            return -101;
+            throw std::out_of_range("неверный индекс");
         }
         return arr[index];
     }
@@ -63,8 +61,10 @@ public:
 
     void push_back(int value)
     {
-        if (value < -100 || value > 100)
-            return;
+        if (value < -100 || value > 100) {
+            throw std::invalid_argument("значение не принадлежит [-100; 100]");
+        }
+
         int *newArray = new int[size + 1];
         for (int i = 0; i < size; i++) {
             newArray[i] = arr[i];
@@ -300,8 +300,28 @@ int main()
     a.setValue(1, 5);
     a.setValue(2, 10);
     cout << "a.getValue(1) " << a.getValue(1) << endl;
-    cout << "a.getValue(1000) ";
-    cout << a.getValue(1000) << endl;
+
+    try {
+        cout << "a.getValue(1000) ";
+        a.getValue(1000);
+    } catch (out_of_range &ex) {
+        cout << ex.what() << endl;
+    }
+
+    try {
+        cout << "a.setValue(5, 1) ";
+        a.setValue(5, 1);
+    } catch (out_of_range &ex) {
+        cout << ex.what() << endl;
+    }
+
+    try {
+        cout << "a.setValue(2, 152) ";
+        a.setValue(2, 152);
+    } catch (invalid_argument &ex) {
+        cout << ex.what() << endl;
+    }
+
     cout << "arr a: ";
     a.printArray();
 
